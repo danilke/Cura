@@ -51,6 +51,16 @@ class LPR(object):
         if d != "\000":
             raise Exception('LPD Protocol Exception {0}'.format(ord(d)))
 
+    def read(self):
+        data = ''
+
+        while True:
+            bytes = self.socket.recv(1024)
+            data += bytes
+
+            if not bytes:
+                return data
+
     def command_restart(self, queue_name):
         #  COMMAND: RESTART
         #  +----+-------+----+
@@ -78,6 +88,28 @@ class LPR(object):
         self.df = 'df{0}{1}'.format(str(random.randint(1000, 9999)), self.hostname)
         self.socket.send(payload)
         self.wait()
+
+    def command_send_queue_state_short(self, queue_name):
+        #+----+-------+----+------+----+
+        #| 03 | Queue | SP | List | LF |
+        #+----+-------+----+------+----+
+        #Command code - 3
+        #Operand 1 - Printer queue name
+        #Other operands - User names or job numbers
+        payload = '\003{0} \012'.format(queue_name)
+        self.socket.send(payload)
+        return self.read()
+
+    def command_send_queue_state_long(self, queue_name):
+        #+----+-------+----+------+----+
+        #| 04 | Queue | SP | List | LF |
+        #+----+-------+----+------+----+
+        #Command code - 4
+        #Operand 1 - Printer queue name
+        #Other operands - User names or job numbers
+        payload = '\004{0} \012'.format(queue_name)
+        self.socket.send(payload)
+        return self.read()
 
     def subcommand_abort(self):
         # SUBCMD: ABORT RECEIVE
