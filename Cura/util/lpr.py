@@ -22,6 +22,11 @@
 #
 import socket, random
 
+
+class LPRError(Exception):
+    pass
+
+
 class LPR(object):
 
     def __init__(self, server, user=None):
@@ -49,7 +54,7 @@ class LPR(object):
     def wait(self):
         d=self.socket.recv(1024)
         if d != "\000":
-            raise Exception('LPD Protocol Exception {0}'.format(ord(d)))
+            raise LPRError('LPD Protocol Exception {0}'.format(ord(d)))
 
     def read(self):
         data = ''
