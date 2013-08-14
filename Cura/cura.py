@@ -37,8 +37,14 @@ def main():
 		profile.loadProfile(profile.getDefaultProfilePath())
 
 	if options.printfile is not None:
-		from Cura.gui import printWindow
-		printWindow.startPrintInterface(options.printfile)
+		backend = profile.getPreference('backend')
+		if backend == 'Serial':
+			from Cura.gui import printWindow
+			printWindow.startPrintInterface(options.printfile)
+		elif backend == 'LPR':
+			from Cura.gui import lprWindow
+			lprWindow.startPrintInterface(options.printfile)
+
 	elif options.slice is not None:
 		from Cura.util import sliceEngine
 		from Cura.util import objectScene
