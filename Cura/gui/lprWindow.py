@@ -89,6 +89,14 @@ def printFile(filename):
 	printWindowHandle.Raise()
 
 
+def startPrintInterface(filename):
+	app = wx.App(False)
+	printWindowHandle = printWindow(filename)
+	printWindowHandle.Show(True)
+	printWindowHandle.Raise()
+	app.MainLoop()
+
+
 class printWindow(wx.Frame):
 	"Main user interface window"
 
