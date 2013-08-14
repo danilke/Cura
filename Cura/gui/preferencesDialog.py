@@ -36,6 +36,13 @@ class preferencesDialog(wx.Dialog):
 		configBase.SettingRow(right, 'filament_cost_kg')
 		configBase.SettingRow(right, 'filament_cost_meter')
 
+		configBase.TitleRow(right, 'Communication settings')
+		configBase.SettingRow(right, 'backend', ['Serial', 'LPR'])
+		configBase.SettingRow(right, 'serial_port', ['AUTO'] + machineCom.serialList())
+		configBase.SettingRow(right, 'serial_baud', ['AUTO'] + map(str, machineCom.baudrateList()))
+		configBase.SettingRow(right, 'lpr_host')
+		configBase.SettingRow(right, 'lpr_queue')
+
 		#configBase.TitleRow(right, 'Slicer settings')
 		#configBase.SettingRow(right, 'save_profile')
 
