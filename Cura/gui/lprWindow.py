@@ -109,7 +109,7 @@ class LPRHandler(object):
 					self.callbackObject.mcConnected(False)
 					self.callbackObject.mcMessage("connection error")
 
-			for i in range(100):
+			for i in range(50):
 				if self._alive and self._filename is None:
 					time.sleep(0.1)
 
