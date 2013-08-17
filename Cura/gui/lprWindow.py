@@ -16,6 +16,41 @@ from Cura.util import profile
 from Cura.util import lpr
 
 
+re_job = re.compile(r"^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+(\d+)\s*(.+?)?\s*(\d+)?\s*([0-9:]+)?$")
+re_status = re.compile(r" Status: LP filter msg - '(.*?)' at ([0-9:.]+)")
+
+
+def read_status(msg):
+    status = None
+
+    for line in msg.split("\n"):
+        if line.startswith(" Status:"):
+            match = re_status.match(line)
+            if match:
+                status = match.groups()[0]
+
+    return status
+
+
+def read_active_job(msg):
+    active = False
+
+    for line in msg.split("\n"):
+        items = line.split()
+
+        if line.startswith(" Rank   Owner/ID"):
+            active = True
+            job_index = items.index("Job")
+
+        if not active or len(line) == 0:
+            continue
+
+        if items[0] == "active":
+            return items[job_index]
+
+    return None
+
+
 class LPRHandler(object):
 	def __init__(self, callbackObject):
 		self.callbackObject = callbackObject
@@ -52,11 +87,13 @@ class LPRHandler(object):
 				if self._alive:
 					self.callbackObject.mcConnected(True)
 
-				lines = lp.command_send_queue_state_long(queue).split("\n")
+				data = lp.command_send_queue_state_long(queue)
 
-				for line in lines:
-					if line.startswith(start):
-						status = line[len(start):-17]
+				job = read_active_job(data)
+				if job is None:
+					status = "waiting"
+				else:
+					status = read_status(data)
 
 				if self._alive:
 					self.callbackObject.mcMessage(status)
